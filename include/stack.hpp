@@ -8,11 +8,11 @@
 using std::size_t;
 using std::ostream;
 
-template<typename T>
+/*template<typename T>
 class stack;
 
 template<typename T>
-ostream & operator<<(ostream & output, stack<T> & stack);
+ostream & operator<<(ostream & output, stack<T> & stack);*/
 
 template<typename T>
 class stack {
@@ -28,7 +28,7 @@ public:
 
 	auto operator=(stack const & rhs) -> stack &; // TESTED
 	auto operator==(stack const & rhs) -> bool; // TESTED
-	friend ostream & operator<< <>(ostream & output, stack<T> const & stack);
+	//friend ostream & operator<< <>(ostream & output, stack<T> const & stack);
 private:
 	T * array_;
 	size_t array_size_;
