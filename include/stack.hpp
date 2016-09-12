@@ -17,16 +17,17 @@ ostream & operator<<(ostream & output, stack<T> & stack);
 template<typename T>
 class stack {
 public:
-	stack();
-	stack(stack const & rhs);
-	~stack();
+	stack(); // TESTED
+	stack(stack const & rhs); // TESTED
+	~stack(); 
 
-	auto count() const noexcept -> size_t;
-	auto top() const -> T;
-	auto pop() -> void;
-	auto push(T const & value) -> void;
+	auto count() const noexcept -> size_t; // TESTED
+	auto top() const -> T; // TESTED
+	auto pop() -> void; // TESTED
+	auto push(T const & value) -> void; // TESTED
 
-	auto operator=(stack const & rhs) -> stack &;
+	auto operator=(stack const & rhs) -> stack &; // TESTED
+	auto operator==(stack const & rhs) -> bool; // TESTED
 	friend ostream & operator<< <>(ostream & output, stack<T> const & stack);
 private:
 	T * array_;
