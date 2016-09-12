@@ -88,12 +88,12 @@ auto stack<T>::swap(stack & rhs) -> void {
 	std::swap(rhs.count_, count_);
 }
 
-template <typename T>
+/*template <typename T>
 ostream & operator<<(ostream & output, stack<T> const & stack) {
 	for (size_t i = 0; i < stack.count_; ++i) {
 		output << stack.array_[i] << " ";
 	}
 	output << std::endl;
 	return output;
-}
+}*/
 #endif // STACK_CPP
