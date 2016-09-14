@@ -1,39 +1,38 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
-//#include <cassert>
 #ifndef STACK_HPP
 #define STACK_HPP
 
 using std::size_t;
-using std::ostream;
+//using std::ostream;
 
-template<typename T>
+/*template<typename T>
 class stack;
-
 template<typename T>
-ostream & operator<<(ostream & output, stack<T> & stack);
+ostream & operator<<(ostream & output, stack<T> & stack);*/
 
 template<typename T>
 class stack {
 public:
 	stack();
-	stack(stack const & rhs);
+	stack(stack const & rhs); 
 	~stack();
 
 	auto count() const noexcept -> size_t;
-	auto top() const -> T;
+	auto top() const -> const T;
 	auto pop() -> void;
-	auto push(T const & value) -> void;
+	auto push(T const & value) -> void; 
 
 	auto operator=(stack const & rhs) -> stack &;
-	friend ostream & operator<< <>(ostream & output, stack<T> const & stack);
+	auto operator==(stack const & rhs) noexcept -> bool;
+	//friend ostream & operator<< <>(ostream & output, stack<T> const & stack);
 private:
 	T * array_;
 	size_t array_size_;
 	size_t count_;
 
-	auto swap(stack & rhs) -> void;
+	auto swap(stack & rhs) noexcept -> void;
 };
 
 #include "stack.cpp"
