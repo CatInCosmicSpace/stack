@@ -53,14 +53,6 @@ inline auto stack<T>::push(T const & value) -> void {
 }
 
 template<typename T>
-auto stack<T>::print() -> void {
-	for (size_t i = 0; i < count_; ++i) {
-		std::cout << array_[i] << " ";
-	}
-	std::cout << std::endl;
-}
-
-template<typename T>
 inline auto stack<T>::operator=(stack const & rhs) -> stack & {
 	if (this != &rhs) {
 		(stack(rhs)).swap(*this);
