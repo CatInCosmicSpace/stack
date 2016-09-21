@@ -3,43 +3,50 @@
 #ifndef STACK_CPP
 #define STACK_CPP
 
-template<typename T>
-inline stack<T>::stack() : count_(0) {
+template<typename T> /*noexcept*/
+inline stack<T>::stack() :	count_(0),
+							array_size_(0),
+							array_(nullptr) {
 }
 
-template<typename T>
-inline stack<T>::stack(stack const & rhs) : array_size_(rhs.array_size_),
-count_(rhs.count_),
-array_(copy(rhs.array_, rhs.count_, rhs.array_size_)) {
+template<typename T> /*strong*/
+inline stack<T>::stack(stack const & rhs) : 
+	array_size_(rhs.array_size_),
+	count_(rhs.count_),
+	array_(copy(rhs.array_, rhs.count_, rhs.array_size_)) {
 }
 
-template<typename T>
+template<typename T> /*noexcept*/
 inline stack<T>::~stack() {
 	delete[] array_;
 }
 
-template<typename T>
+template<typename T> /*noexcept*/
 inline auto stack<T>::count() const noexcept -> size_t {
 	return count_;
 }
 
-template<typename T>
+template<typename T> /*strong*/
 auto stack<T>::top() const -> const T& {
 	if (count_ == 0) {
 		throw std::range_error("stack is empty");
 	}
-	return array_[count_ - 1];
+	else {
+		return array_[count_ - 1];
+	}
 }
 
-template<typename T>
+template<typename T> /*strong*/
 inline auto stack<T>::pop() -> void {
 	if (count_ == 0) {
 		throw std::logic_error("stack is empty");
 	}
-	--count_;
+	else {
+		--count_;
+	}
 }
 
-template<typename T>
+template<typename T> /*strong*/
 inline auto stack<T>::push(T const & value) -> void {
 	if (count_ == array_size_) {
 		size_t size = array_size_ * 2 + (array_size_ == 0);
@@ -52,7 +59,7 @@ inline auto stack<T>::push(T const & value) -> void {
 	++count_;
 }
 
-template<typename T>
+template<typename T> /*strong*/
 inline auto stack<T>::operator=(stack const & rhs) -> stack & {
 	if (this != &rhs) {
 		(stack(rhs)).swap(*this);
@@ -60,7 +67,7 @@ inline auto stack<T>::operator=(stack const & rhs) -> stack & {
 	return *this;
 }
 
-template<typename T>
+template<typename T> /*noexcept*/
 auto stack<T>::operator==(stack const & rhs) -> bool {
 	if ((rhs.count_ != count_) || (rhs.array_size_ != array_size_)) {
 		return false;
@@ -75,8 +82,15 @@ auto stack<T>::operator==(stack const & rhs) -> bool {
 	return true;
 }
 
-template<typename T>
-auto stack<T>::copy(const T * rhs, size_t sizeLeft, size_t sizeRight) -> T * {
+template<typename T> /*noexcept*/
+auto stack<T>::swap(stack & rhs) -> void {
+	std::swap(rhs.array_size_, array_size_);
+	std::swap(rhs.array_, array_);
+	std::swap(rhs.count_, count_);
+}
+
+template<typename T>  /*strong*/
+auto copy(const T * rhs, size_t sizeLeft, size_t sizeRight) -> T * {
 	T * m_array = new T[sizeRight];
 	try {
 		std::copy(rhs, rhs + sizeLeft, m_array);
@@ -88,10 +102,4 @@ auto stack<T>::copy(const T * rhs, size_t sizeLeft, size_t sizeRight) -> T * {
 	return m_array;
 }
 
-template<typename T>
-auto stack<T>::swap(stack & rhs) -> void {
-	std::swap(rhs.array_size_, array_size_);
-	std::swap(rhs.array_, array_);
-	std::swap(rhs.count_, count_);
-}
 #endif // STACK_CPP
