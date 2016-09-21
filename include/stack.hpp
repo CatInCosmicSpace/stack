@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -17,7 +18,8 @@ public:
 	stack(stack const & rhs); /*strong*/
 	~stack(); /*noexcept*/
 
-	auto count() const noexcept->size_t; /*noexcept*/
+	auto count() const noexcept -> size_t; /*noexcept*/
+	auto empty() const noexcept -> bool; /*noexcept*/
 	auto top() const -> const T&; /*strong*/
 	auto pop() -> void; /*strong*/
 	auto push(T const & value) -> void; /*strong*/

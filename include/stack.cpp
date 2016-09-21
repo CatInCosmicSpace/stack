@@ -26,6 +26,11 @@ inline auto stack<T>::count() const noexcept -> size_t {
 	return count_;
 }
 
+template<typename T> /*noexcept*/
+auto stack<T>::empty() const noexcept -> bool {
+	return (count_ == 0);
+}
+
 template<typename T> /*strong*/
 auto stack<T>::top() const -> const T& {
 	if (count_ == 0) {
