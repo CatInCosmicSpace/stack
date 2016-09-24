@@ -1,18 +1,31 @@
 #pragma once
-#include <cstdlib>
 #include <iostream>
-#include <memory>
 #ifndef STACK_HPP
 #define STACK_HPP
 
 using std::size_t;
 using std::ostream;
- 
+
 template<typename T>
 auto copy(const T * rhs, size_t sizeLeft, size_t sizeRight)->T *; /*strong*/
 
+template <typename T>
+class allocator {
+protected:
+	explicit allocator(size_t size = 0); /*noexcept*/
+	~allocator(); /*noexcept*/
+	auto swap(allocator & other) -> void; /*noexcept*/
+
+	allocator(allocator const &) = delete;
+	auto operator=(allocator const &) -> allocator & = delete;
+
+	T * ptr_;
+	size_t size_;
+	size_t count_;
+};
+
 template<typename T>
-class stack {
+class stack : protected allocator<T> {
 public:
 	stack(); /*noexcept*/
 	stack(stack const & rhs); /*strong*/
@@ -26,12 +39,6 @@ public:
 
 	auto operator=(stack const & rhs)->stack &; /*strong*/
 	auto operator==(stack const & rhs) -> bool; /*noexcept*/
-private:
-	T * array_;
-	size_t array_size_;
-	size_t count_;
-
-	auto swap(stack & rhs) -> void; /*noexcept*/
 };
 
 #include "stack.cpp"

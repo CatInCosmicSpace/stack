@@ -3,65 +3,94 @@
 #ifndef STACK_CPP
 #define STACK_CPP
 
+//////////////////////////////////////////////
+//										//
+//				  Allocator				//
+//										//
+//////////////////////////////////////////////
+
 template<typename T> /*noexcept*/
-inline stack<T>::stack() :	count_(0),
-							array_size_(0),
-							array_(nullptr) {
+inline allocator<T>::allocator(size_t size) :
+	ptr_(static_cast<T *>(size == 0 ? nullptr : operator new(size * sizeof(T)))),
+	size_(0),
+	count_(size) {
+}
+
+template<typename T> /*noexcept*/
+inline allocator<T>::~allocator() {
+	delete[] ptr_;
+}
+
+template<typename T> /*noexcept*/
+auto allocator<T>::swap(allocator & other) -> void {
+	std::swap(ptr_, other.ptr_);
+	std::swap(count_, other.count_);
+	std::swap(size_, other.size_);
+}
+
+//////////////////////////////////////////////
+//										//
+//				  Stack					//
+//										//
+//////////////////////////////////////////////
+
+template<typename T> /*noexcept*/
+inline stack<T>::stack() :
+	allocator<T>() {
 }
 
 template<typename T> /*strong*/
-inline stack<T>::stack(stack const & rhs) : 
-	array_size_(rhs.array_size_),
-	count_(rhs.count_),
-	array_(copy(rhs.array_, rhs.count_, rhs.array_size_)) {
+inline stack<T>::stack(stack const & rhs) :
+	allocator<T>(rhs.count_) {
+	allocator<T>::ptr_ = copy(rhs.ptr_, rhs.count_, rhs.size_);
+	allocator<T>::size_ = rhs.size_;
 }
 
 template<typename T> /*noexcept*/
 inline stack<T>::~stack() {
-	delete[] array_;
 }
 
 template<typename T> /*noexcept*/
 inline auto stack<T>::count() const noexcept -> size_t {
-	return count_;
+	return allocator<T>::count_;
 }
 
 template<typename T> /*noexcept*/
 auto stack<T>::empty() const noexcept -> bool {
-	return (count_ == 0);
+	return (allocator<T>::count_ == 0);
 }
 
 template<typename T> /*strong*/
 auto stack<T>::top() const -> const T& {
-	if (count_ == 0) {
+	if (allocator<T>::count_ == 0) {
 		throw std::range_error("stack is empty");
 	}
 	else {
-		return array_[count_ - 1];
+		return allocator<T>::ptr_[allocator<T>::count_ - 1];
 	}
 }
 
 template<typename T> /*strong*/
 inline auto stack<T>::pop() -> void {
-	if (count_ == 0) {
+	if (allocator<T>::count_ == 0) {
 		throw std::logic_error("stack is empty");
 	}
 	else {
-		--count_;
+		--allocator<T>::count_;
 	}
 }
 
 template<typename T> /*strong*/
 inline auto stack<T>::push(T const & value) -> void {
-	if (count_ == array_size_) {
-		size_t size = array_size_ * 2 + (array_size_ == 0);
-		T * newArray = copy(array_, count_, size);
-		delete[] array_;
-		array_ = newArray;
-		array_size_ = size;
+	if (allocator<T>::count_ == allocator<T>::size_) {
+		size_t size = allocator<T>::size_ * 2 + (allocator<T>::size_ == 0);
+		T * newArray = copy(allocator<T>::ptr_, allocator<T>::count_, size);
+		delete[] allocator<T>::ptr_;
+		allocator<T>::ptr_ = newArray;
+		allocator<T>::size_ = size;
 	}
-	array_[count_] = value;
-	++count_;
+	allocator<T>::ptr_[allocator<T>::count_] = value;
+	++allocator<T>::count_;
 }
 
 template<typename T> /*strong*/
@@ -74,24 +103,17 @@ inline auto stack<T>::operator=(stack const & rhs) -> stack & {
 
 template<typename T> /*noexcept*/
 auto stack<T>::operator==(stack const & rhs) -> bool {
-	if ((rhs.count_ != count_) || (rhs.array_size_ != array_size_)) {
+	if ((rhs.count_ != allocator<T>::count_) || (rhs.size_ != allocator<T>::size_)) {
 		return false;
 	}
 	else {
-		for (size_t i = 0; i < count_; i++) {
-			if (rhs.array_[i] != array_[i]) {
+		for (size_t i = 0; i < allocator<T>::count_; i++) {
+			if (rhs.ptr_[i] != allocator<T>::ptr_[i]) {
 				return false;
 			}
 		}
 	}
 	return true;
-}
-
-template<typename T> /*noexcept*/
-auto stack<T>::swap(stack & rhs) -> void {
-	std::swap(rhs.array_size_, array_size_);
-	std::swap(rhs.array_, array_);
-	std::swap(rhs.count_, count_);
 }
 
 template<typename T>  /*strong*/
