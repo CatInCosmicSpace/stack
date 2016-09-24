@@ -4,9 +4,9 @@
 #define STACK_CPP
 
 //////////////////////////////////////////////
-//										//
-//				  Allocator				//
-//										//
+//					    //
+//		Allocator		    //
+//					    //
 //////////////////////////////////////////////
 
 template<typename T> /*noexcept*/
@@ -29,9 +29,9 @@ auto allocator<T>::swap(allocator & other) -> void {
 }
 
 //////////////////////////////////////////////
-//										//
-//				  Stack					//
-//										//
+//				            //
+//		Stack			    //
+//					    //
 //////////////////////////////////////////////
 
 template<typename T> /*noexcept*/
