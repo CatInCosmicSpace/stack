@@ -18,7 +18,7 @@ inline allocator<T>::allocator(size_t size) :
 
 template<typename T> /*noexcept*/
 inline allocator<T>::~allocator() {
-	delete[] ptr_;
+	delete ptr_;
 }
 
 template<typename T> /*noexcept*/
