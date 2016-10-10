@@ -31,7 +31,7 @@ protected:
 };
 
 template<typename T>
-class stack : protected ::allocator<T> {
+class stack : private ::allocator<T> {
 public:
 	stack(); /*noexcept*/
 	stack(stack const & rhs); /*strong*/
