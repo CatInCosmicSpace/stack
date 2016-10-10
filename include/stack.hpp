@@ -1,3 +1,60 @@
+//#pragma once
+//#include <iostream>
+//#ifndef STACK_HPP
+//#define STACK_HPP
+//
+//using std::size_t;
+//using std::ostream;
+//
+//template<typename T>
+//auto copy(const T * rhs, size_t sizeLeft, size_t sizeRight)->T *; /*strong*/
+//
+//template <typename T>
+//class allocator {
+//public:
+//	explicit allocator(std::size_t size = 0); /*noexcept*/
+//	allocator(allocator const & other); /*strong*/
+//	auto operator=(allocator const & other) -> allocator & = delete;
+//	~allocator(); /*noexcept*/
+//	auto resize() -> void;
+//	auto swap(allocator & other) -> void; /*noexcept*/
+//	auto construct(T * ptr, T const & value) -> void;
+//	auto destroy(T * ptr) -> void;
+//	auto get() -> T *;
+//	auto get() const -> T const *;
+//	auto count() const -> size_t; /*noexcept*/
+//	auto full() const -> bool; /*noexcept*/
+//	auto empty() const -> bool; /*noexcept*/
+//protected:
+//	T * ptr_;
+//	size_t count_;
+//	size_t size_;
+//};
+//
+//
+//template<typename T>
+//class stack : protected allocator<T> {
+//public:
+//	stack(); /*noexcept*/
+//	stack(stack const & rhs); /*strong*/
+//	~stack(); /*noexcept*/
+//
+//	auto count() const noexcept -> size_t; /*noexcept*/
+//	auto empty() const noexcept -> bool; /*noexcept*/
+//	auto top() const -> const T&; /*strong*/
+//	auto pop() -> void; /*strong*/
+//	auto push(T const & value) -> void; /*strong*/
+//
+//	auto operator=(stack const & rhs)->stack &; /*strong*/
+//	auto operator==(stack const & rhs) -> bool; /*noexcept*/
+//private:
+//	allocator<T> ptr;
+//};
+//
+//#include "stack.cpp"
+//
+//#endif // STACK_HPP
+
 #pragma once
 #include <iostream>
 #ifndef STACK_HPP
@@ -8,6 +65,12 @@ using std::ostream;
 
 template<typename T>
 auto copy(const T * rhs, size_t sizeLeft, size_t sizeRight)->T *; /*strong*/
+template <typename T1, typename T2>
+auto construct(T1 * ptr, T2 const & value) -> void;
+template <typename T>
+auto destroy(T * ptr) noexcept -> void;
+template <typename FwdIter>
+auto destroy(FwdIter first, FwdIter last) noexcept -> void;
 
 template <typename T>
 class allocator {
@@ -17,7 +80,7 @@ protected:
 	auto swap(allocator & other) -> void; /*noexcept*/
 
 	allocator(allocator const &) = delete;
-	auto operator=(allocator const &) -> allocator & = delete;
+	auto operator=(allocator const &)->allocator & = delete;
 
 	T * ptr_;
 	size_t size_;
@@ -25,13 +88,13 @@ protected:
 };
 
 template<typename T>
-class stack : protected allocator<T> {
+class stack : protected ::allocator<T> {
 public:
 	stack(); /*noexcept*/
 	stack(stack const & rhs); /*strong*/
 	~stack(); /*noexcept*/
 
-	auto count() const noexcept -> size_t; /*noexcept*/
+	auto count() const noexcept->size_t; /*noexcept*/
 	auto empty() const noexcept -> bool; /*noexcept*/
 	auto top() const -> const T&; /*strong*/
 	auto pop() -> void; /*strong*/
@@ -43,4 +106,4 @@ public:
 
 #include "stack.cpp"
 
-#endif // STACK_HPP
+#endif
