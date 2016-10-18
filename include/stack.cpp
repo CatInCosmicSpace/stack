@@ -80,7 +80,7 @@ inline auto stack<T>::pop() -> void {
 		throw std::logic_error("stack is empty");
 	}
 	else {
-		destroy(ptr_ + count_);
+		destroy(ptr_ + count_ - 1);
 		--count_;
 	}
 }
