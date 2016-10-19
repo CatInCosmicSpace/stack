@@ -36,67 +36,71 @@ auto allocator<T>::swap(allocator & other) -> void {
 //////////////////////////////////////////////
 
 template<typename T> /*noexcept*/
-inline stack<T>::stack() :
-	allocator<T>() {
+inline stack<T>::stack(size_t size = 0) :
+	allocator<T>(size) {
 }
 
 template<typename T> /*strong*/
 inline stack<T>::stack(stack const & rhs) :
 	allocator<T>(rhs.size_) {
-	for (size_t i = count_; i < rhs.count_; ++i) {
-		construct(ptr_ + i, rhs.ptr_[i]);
+	for (size_t i = this->count_; i < rhs.count_; ++i) {
+		construct(this->ptr_ + i, rhs.ptr_[i]);
 	}
-	count_ = rhs.count_;
+	this->count_ = rhs.count_;
 }
 
 template<typename T> /*noexcept*/
 inline stack<T>::~stack() {
-	destroy(ptr_);
+	destroy(this->ptr_, this->ptr_ + this->count_);
 }
 
 template<typename T> /*noexcept*/
 inline auto stack<T>::count() const noexcept -> size_t {
-	return count_;
+	return this->count_;
 }
 
 template<typename T> /*noexcept*/
 inline auto stack<T>::empty() const noexcept -> bool {
-	return (count_ == 0);
+	return (this->count_ == 0);
 }
 
 template<typename T> /*strong*/
 inline auto stack<T>::top() const -> const T&{
-	if (count_ == 0) {
+	if (this->count_ == 0) {
 		throw std::range_error("stack is empty");
 	}
 	else {
-		return ptr_[count_ - 1];
+		return this->ptr_[count_ - 1];
 	}
 }
 
 template<typename T> /*strong*/
 inline auto stack<T>::pop() -> void {
-	if (count_ == 0) {
+	if (this->count_ == 0) {
 		throw std::logic_error("stack is empty");
 	}
 	else {
-		destroy(ptr_ + count_);
-		--count_;
+		destroy(this->ptr_ + this->count_ - 1);
+		--this->count_;
 	}
 }
 
 template<typename T> /*strong*/
 inline auto stack<T>::push(T const & value) -> void {
-	if (count_ == size_) {
-		size_t size = size_ * 2 + (size_ == 0);
-		T * newArray = copy(ptr_, count_, size);
-		delete[] ptr_;
-		ptr_ = newArray;
-		size_ = size;
+	if (this->count_ == this->size_) {
+		size_t array_size = this->size_ * 2 + (this->size_ == 0);
+
+		stack<T> temp(array_size);
+		//stack temp(array_size);
+		while (temp.count() < this->count_) {
+			temp.push(this->ptr_[temp.count()]);
+		}
+
+		this->swap(temp);
 	}
-	construct(ptr_ + count_, value);
-	//ptr_[count_] = value;
-	++count_;
+
+	construct(this->ptr_ + this->count_, value);
+	++this->count_;
 }
 
 template<typename T> /*strong*/
@@ -109,12 +113,12 @@ inline auto stack<T>::operator=(stack const & rhs) -> stack & {
 
 template<typename T> /*noexcept*/
 inline auto stack<T>::operator==(stack const & rhs) -> bool {
-	if ((rhs.count_ != count_) || (rhs.size_ != size_)) {
+	if ((rhs.count_ != this->count_) || (rhs.size_ != this->size_)) {
 		return false;
 	}
 	else {
-		for (size_t i = 0; i < count_; i++) {
-			if (rhs.ptr_[i] != ptr_[i]) {
+		for (size_t i = 0; i < this->count_; i++) {
+			if (rhs.ptr_[i] != this->ptr_[i]) {
 				return false;
 			}
 		}
