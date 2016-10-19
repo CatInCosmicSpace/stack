@@ -90,7 +90,7 @@ inline auto stack<T>::push(T const & value) -> void {
 	if (this->count_ == this->size_) {
 		size_t array_size = this->size_ * 2 + (this->size_ == 0);
 
-		stack<T> temp(array_size);
+		stack<T> temp{ array_size };
 		//stack temp(array_size);
 		while (temp.count() < this->count_) {
 			temp.push(this->ptr_[temp.count()]);
