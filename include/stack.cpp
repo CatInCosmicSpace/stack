@@ -36,7 +36,7 @@ auto allocator<T>::swap(allocator & other) -> void {
 //////////////////////////////////////////////
 
 template<typename T> /*noexcept*/
-inline stack<T>::stack(size_t size = 0) :
+inline stack<T>::stack(size_t size) :
 	allocator<T>(size) {
 }
 
@@ -67,17 +67,17 @@ inline auto stack<T>::empty() const noexcept -> bool {
 template<typename T> /*strong*/
 inline auto stack<T>::top() const -> const T&{
 	if (this->count_ == 0) {
-		throw std::range_error("stack is empty");
+		throw;
 	}
 	else {
-		return this->ptr_[count_ - 1];
+		return this->ptr_[this->count_ - 1];
 	}
 }
 
 template<typename T> /*strong*/
 inline auto stack<T>::pop() -> void {
 	if (this->count_ == 0) {
-		throw std::logic_error("stack is empty");
+		throw;
 	}
 	else {
 		destroy(this->ptr_ + this->count_ - 1);

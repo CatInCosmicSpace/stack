@@ -1,4 +1,4 @@
-#pragma once
+#pragma once 
 #include <iostream>
 #ifndef STACK_HPP
 #define STACK_HPP
