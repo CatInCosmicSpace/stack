@@ -1,4 +1,5 @@
 #include "stack.hpp"
+#include <stdexcept>
 
 #ifndef STACK_CPP
 #define STACK_CPP
@@ -67,7 +68,7 @@ inline auto stack<T>::empty() const noexcept -> bool {
 template<typename T> /*strong*/
 inline auto stack<T>::top() const -> const T&{
 	if (this->count_ == 0) {
-		throw;
+		throw std::logic_error("empty stack");
 	}
 	else {
 		return this->ptr_[this->count_ - 1];
@@ -77,7 +78,7 @@ inline auto stack<T>::top() const -> const T&{
 template<typename T> /*strong*/
 inline auto stack<T>::pop() -> void {
 	if (this->count_ == 0) {
-		throw;
+		throw std::logic_error("empty stack");
 	}
 	else {
 		destroy(this->ptr_ + this->count_ - 1);
