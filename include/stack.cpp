@@ -1,4 +1,5 @@
 #include "stack.hpp"
+#include <stdexcept>
 
 #ifndef STACK_CPP
 #define STACK_CPP
