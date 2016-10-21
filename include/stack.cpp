@@ -67,7 +67,7 @@ inline auto stack<T>::empty() const noexcept -> bool {
 template<typename T> /*strong*/
 inline auto stack<T>::top() const throw(std::logic_error) -> const T&{
 	if (this->count_ == 0) {
-		throw std::logic_error;
+		throw std::logic_error("empty stack");
 	}
 	else {
 		return this->ptr_[this->count_ - 1];
@@ -77,7 +77,7 @@ inline auto stack<T>::top() const throw(std::logic_error) -> const T&{
 template<typename T> /*strong*/
 inline auto stack<T>::pop() throw(std::logic_error) -> void {
 	if (this->count_ == 0) {
-		throw std::logic_error;
+		throw std::logic_error("empty stack");
 	}
 	else {
 		destroy(this->ptr_ + this->count_ - 1);
