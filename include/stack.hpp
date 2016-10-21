@@ -1,5 +1,6 @@
 #pragma once 
 #include <iostream>
+#include<stdexcept>
 #ifndef STACK_HPP
 #define STACK_HPP
 
@@ -37,13 +38,13 @@ public:
 	stack(stack const & rhs); /*strong*/
 	~stack(); /*noexcept*/
 
-	auto count() const noexcept->size_t; /*noexcept*/
+	auto count() const noexcept -> size_t; /*noexcept*/
 	auto empty() const noexcept -> bool; /*noexcept*/
-	auto top() const -> const T&; /*strong*/
-	auto pop() -> void; /*strong*/
+	auto top() const throw(std::logic_error) -> const T&; /*strong*/
+	auto pop() throw(std::logic_error) -> void; /*strong*/
 	auto push(T const & value) -> void; /*strong*/
 
-	auto operator=(stack const & rhs)->stack &; /*strong*/
+	auto operator=(stack const & rhs) -> stack &; /*strong*/
 	auto operator==(stack const & rhs) -> bool; /*noexcept*/
 };
 
