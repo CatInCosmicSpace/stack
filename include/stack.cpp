@@ -10,13 +10,11 @@
 //////////////////////////////
 
 inline dynamic_bitset::dynamic_bitset(size_t size) noexcept :
-bits(size) {
-	// Создаем пустой битсет, заполненный нулями
+	bits(size) {
 	this->reset();
 }
 
 inline auto dynamic_bitset::all() const noexcept -> bool {
-	// Проврека на то, что все позиции заняты
 	auto check = true;
 	for (auto i : bits) {
 		if (i == false) {
@@ -27,7 +25,6 @@ inline auto dynamic_bitset::all() const noexcept -> bool {
 }
 
 inline auto dynamic_bitset::any() noexcept -> bool {
-	// Проверка на то, что хоть одна позиция занята
 	auto check = false;
 	for (auto i : bits) {
 		if (i == true) {
@@ -38,21 +35,17 @@ inline auto dynamic_bitset::any() noexcept -> bool {
 }
 
 inline auto dynamic_bitset::count() const noexcept -> size_t {
-	// Количество занятых позиций
 	return bits.size();
 }
 
 inline auto dynamic_bitset::flip() noexcept -> void {
-	// Смена значения всех элементов
 	for (auto i : bits) {
 		i.flip();
 	}
 }
 
 inline auto dynamic_bitset::flip(size_t pos) throw(std::out_of_range) -> void {
-	// Проверка на обращение по верному индексу
 	if (pos < bits.size()) {
-		// Смена значения элемента на позиции pos
 		bits.at(pos).flip();
 	}
 	else {
@@ -61,7 +54,6 @@ inline auto dynamic_bitset::flip(size_t pos) throw(std::out_of_range) -> void {
 }
 
 inline auto dynamic_bitset::none() const noexcept -> bool {
-	// Ни одна позиция не занята
 	auto check = true;
 	for (auto i : bits) {
 		if (i == true) {
@@ -72,16 +64,13 @@ inline auto dynamic_bitset::none() const noexcept -> bool {
 }
 
 inline auto dynamic_bitset::reset() noexcept -> void {
-	// Установка всех позиций в 0
 	for (auto i : bits) {
 		i = false;
 	}
 }
 
 inline auto dynamic_bitset::reset(size_t pos) throw(std::out_of_range) -> void {
-	// Проверка на обращение по верному индексу
 	if (pos < bits.size()) {
-		// Установка элемента на позиции pos в 0
 		bits.at(pos) = false;
 	}
 	else {
@@ -90,16 +79,13 @@ inline auto dynamic_bitset::reset(size_t pos) throw(std::out_of_range) -> void {
 }
 
 inline auto dynamic_bitset::set() noexcept -> void {
-	// Установка всех значение в 1
 	for (auto i : bits) {
 		i = true;
 	}
 }
 
 inline auto dynamic_bitset::set(size_t pos) throw(std::out_of_range) -> void {
-	// Проверка на обращение по верному индексу
 	if (pos < bits.size()) {
-		// Установка элемента на позиции pos в 0
 		bits.at(pos) = true;
 	}
 	else {
@@ -108,14 +94,11 @@ inline auto dynamic_bitset::set(size_t pos) throw(std::out_of_range) -> void {
 }
 
 inline auto dynamic_bitset::size() const noexcept -> size_t {
-	// Количество элементов, которые можно хранить в битсете
 	return bits.capacity();
 }
 
 inline auto dynamic_bitset::test(size_t pos) const throw(std::out_of_range) -> bool {
-	// Проверка на обращение по верному индексу
 	if (pos < bits.size()) {
-		// Возвращение бит на позиции pos
 		return bits.at(pos);
 	}
 	else {
@@ -124,7 +107,6 @@ inline auto dynamic_bitset::test(size_t pos) const throw(std::out_of_range) -> b
 }
 
 inline auto dynamic_bitset::operator[](size_t pos) throw(std::out_of_range) -> bool {
-	// Аналогично test
 	if (pos < bits.size()) {
 		return bits.at(pos);
 	}
@@ -134,7 +116,6 @@ inline auto dynamic_bitset::operator[](size_t pos) throw(std::out_of_range) -> b
 }
 
 inline auto dynamic_bitset::resize() noexcept -> void {
-	// Увеличение размера битсета в 2 раза
 	bits.resize(bits.size() * 2 + (bits.size() == 0));
 }
 
@@ -154,13 +135,14 @@ inline allocator<T>::allocator(size_t size) :
 
 template<typename T>
 inline allocator<T>::allocator(allocator const & other) :
-	ptr_(static_cast<T *>(other.count_ == 0 ? nullptr : operator new(other.count_ * sizeof(T)))),
+	ptr_(static_cast<T *>(other.size_ == 0 ? nullptr : operator new(other.size_ * sizeof(T)))),
 	size_(other.size_),
 	bitset_(other.bitset_) {
 	for (size_t i = 0; i < other.count_; ++i) {
-		this->construct(this->ptr_ + i, other.ptr_[i]);
+		if (bitset_.test(i)) {
+			this->construct(this->ptr_ + i, other.ptr_[i]);
+		}
 	}
-	this->count_ = other.count_;
 }
 
 template<typename T>
@@ -168,7 +150,6 @@ inline auto allocator<T>::construct(T * ptr, T const & value) -> void {
 	if (ptr < ptr_ || ptr >= ptr_ + size_) {
 		throw std::out_of_range("out of range");
 	}
-	// Создание элемента в аллокаторе
 	new(ptr) T(value);
 	++count_;
 	bitset_.set(ptr - ptr_);
@@ -179,18 +160,13 @@ auto allocator<T>::count() const -> size_t {
 	return count_;
 }
 
-template<typename T> // Удаление одного объекта из аллокатора
+template<typename T>
 auto allocator<T>::destroy(T * ptr) -> void {
-	// Проверка на наличие объекта в аллокаторе
 	if (ptr < ptr_ || ptr >= ptr_ + size_) {
 		throw std::out_of_range("out of range");
 	}
-	// Явный вызов деструктора
 	ptr->~T();
-	// Уменьшение кол-ва элементов, хранимых в данный
-	// момент в аллокаторе на 1
 	--count_;
-	// Отмечаем, что данная позиция свободна в битсете
 	bitset_.reset(ptr - ptr_);
 }
 
@@ -226,9 +202,6 @@ auto allocator<T>::resize() -> void {
 
 template<typename T>
 inline allocator<T>::~allocator() {
-	// Если в аллокаторе хранятся объекты,
-	// то явно вызываем их деструкторы,
-	// а затем очищаем память
 	if (count_ > 0) {
 		destroy(ptr_, ptr_ + count_);
 	}
