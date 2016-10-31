@@ -1,5 +1,6 @@
 #pragma once 
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -10,83 +11,80 @@ using std::size_t;
 using std::ostream;
 
 template<typename T>
-auto copy(const T * rhs, size_t sizeLeft, size_t sizeRight) -> T *; /*strong*/
+auto copy(const T * rhs, size_t sizeLeft, size_t sizeRight)->T *; /*strong*/
 template <typename T1, typename T2>
 auto construct(T1 * ptr, T2 const & value) -> void;
 template <typename T>
 auto destroy(T * ptr) noexcept -> void;
-template <typename FwdIter>
-auto destroy(FwdIter first, FwdIter last) noexcept -> void;
 
-class dynamic_bitset {
+class bitset {
 public:
-	explicit dynamic_bitset(size_t size = 0) noexcept;
+	explicit bitset(size_t size);
 
-	auto all() const noexcept -> bool;
-	auto any() noexcept -> bool;
-	auto count() const noexcept -> size_t;
-	auto flip() noexcept -> void;
-	auto flip(size_t pos) throw(std::out_of_range) -> void;
-	auto none() const noexcept -> bool;
-	auto resize() noexcept -> void;
-	auto reset() noexcept -> void;
-	auto reset(size_t pos) throw(std::out_of_range) -> void;
-	auto set() noexcept -> void;
-	auto set(size_t pos) throw(std::out_of_range) -> void;
-	auto size() const noexcept -> size_t;
-	auto test(size_t pos) const throw(std::out_of_range) -> bool;
+	bitset(bitset const & other) = delete;
+	auto operator =(bitset const & other) -> bitset & = delete;
 
-	auto operator[](size_t pos) throw(std::out_of_range) -> bool;
+	bitset(bitset && other) = delete;
+	auto operator =(bitset && other) -> bitset & = delete;
+
+	auto set(size_t index) throw(std::out_of_range) /*strong*/ -> void;
+	auto reset(size_t index) throw(std::out_of_range) /*strong*/ -> void;
+	auto test(size_t index) const throw(std::out_of_range) /*strong*/ -> bool;
+
+	auto size() const /*noexcept*/ -> size_t;
+	auto counter() const /*noexcept*/ -> size_t;
 private:
-	std::vector<bool> bits;
+	std::unique_ptr<bool[]>  ptr_;
+	size_t size_;
+	size_t counter_;
 };
 
 template <typename T>
 class allocator {
 public:
-	explicit allocator(size_t size = 0);
-	allocator(allocator const & other);
-	auto operator=(allocator const & other) -> allocator & = delete;
+	explicit allocator(std::size_t size = 0) /*strong*/;
+	allocator(allocator const & other) /*strong*/;
+	auto operator =(allocator const & other) -> allocator & = delete;
 	~allocator();
 
-	auto construct(T * ptr, T const & value) -> void;
-	auto count() const -> size_t;
-	auto destroy(T * ptr) -> void;
-	auto empty() const -> bool;
-	auto full() const -> bool;
-	auto get() -> T *;
-	auto get() const -> T const *;
-	auto resize() -> void;
-	auto swap(allocator & other) -> void;
+	auto resize() /*strong*/ -> void;
+
+	auto construct(T * ptr, T const & value) /*strong*/ -> void;
+	auto destroy(T * ptr) /*noexcept*/ -> void;
+
+	auto get() /*noexcept*/ -> T *;
+	auto get() const /*noexcept*/ -> T const *;
+
+	auto count() const /*noexcept*/ -> size_t;
+	auto full() const /*noexcept*/ -> bool;
+	auto empty() const /*noexcept*/ -> bool;
 private:
+	auto destroy(T * first, T * last) /*noexcept*/ -> void;
+	auto swap(allocator & other) /*noexcept*/ -> void;
+
 	T * ptr_;
 	size_t size_;
-	size_t count_;
-	dynamic_bitset bitset_;
-
-	template <typename FwdIter>
-	auto destroy(FwdIter first, FwdIter last) noexcept -> void;
+	std::unique_ptr<bitset> map_;
 };
 
-template<typename T>
+template <typename T>
 class stack {
 public:
-	explicit stack(size_t size = 0); /*noexcept*/
-	stack(stack const & rhs); /*strong*/
-	~stack(); /*noexcept*/
+	explicit stack(size_t size = 0);
+	auto operator =(stack const & other) /*strong*/ -> stack &;
 
-	auto count() const noexcept->size_t; /*noexcept*/
-	auto empty() const noexcept -> bool; /*noexcept*/
-	auto top() const -> const T&; /*strong*/
-	auto pop() -> void; /*strong*/
-	auto push(T const & value) -> void; /*strong*/
+	auto empty() const /*noexcept*/ -> bool;
+	auto count() const /*noexcept*/ -> size_t;
 
-	auto print() -> void;
+	auto push(T const & value) /*strong*/ -> void;
+	auto pop() /*strong*/ -> void;
+	auto top() /*strong*/ -> T &;
+	auto top() const /*strong*/ -> T const &;
 
-	auto operator=(stack const & rhs) -> stack &; /*strong*/
-	auto operator==(stack const & rhs) -> bool; /*noexcept*/
 private:
-	allocator<T> alloc;
+	allocator<T> allocator_;
+
+	static auto throw_is_empty() throw(std::logic_error) -> void;
 };
 
 #include "stack.cpp"
