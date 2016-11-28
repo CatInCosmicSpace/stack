@@ -14,13 +14,6 @@ SCENARIO("Stack: operator==", "[op==]") {
 	REQUIRE(a == b);
 }
 
-SCENARIO("Stack: copy", "[copy]") {
-stack	<size_t> a;
-	a.push(1);
-	stack<size_t> b = a;
-	REQUIRE(a == b);
-}
-
 SCENARIO("Stack: count", "[count]") {
 	stack<size_t> a;
 	a.push(1);
