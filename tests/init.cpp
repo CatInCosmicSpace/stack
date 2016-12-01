@@ -72,7 +72,7 @@ SCENARIO("Stack: top and pop threads", "threads") {
 	REQUIRE(st.empty());
 }
 
-SCENARIO("Stack: copy", "[copy ctor]") {
+SCENARIO("Stack: copy threads", "[copy ctor]") {
 	stack<int> A;
 	A.push(221);
 	stack<int> B = A;
