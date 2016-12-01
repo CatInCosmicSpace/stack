@@ -235,6 +235,14 @@ inline stack<T>::stack(size_t size) :
 	mut() {
 }
 
+template<typename T>
+stack<T>::stack(stack const & rhs) :
+	alloc(0),
+	mut() {
+	std::lock_guard<std::mutex> lock(rhs.mut);
+	allocator<T>(rhs.alloc).swap(alloc);
+}
+
 template<typename T> /*noexcept*/
 inline stack<T>::~stack() {
 }
@@ -251,25 +259,39 @@ inline auto stack<T>::empty() const noexcept -> bool {
 	return (alloc.count() == 0);
 }
 
-template<typename T> /*strong*/
-inline auto stack<T>::top() const -> const T&{
-	std::lock_guard<std::mutex> lock(mut);
-	if (alloc.count() == 0) {
-		throw;
-	}
-	else {
-		return alloc.get()[alloc.count() - 1];
-	}
-}
+//template<typename T> /*strong*/
+//inline auto stack<T>::top() const -> const T& {
+//	std::lock_guard<std::mutex> lock(mut);
+//	if (alloc.count() == 0) {
+//		throw;
+//	}
+//	else {
+//		const std::shared_ptr<T> top(std::make_shared<T>(alloc.get()[alloc.count() - 1]));
+//		return top;
+//	}
+//}
+//
+//template<typename T> /*strong*/
+//inline auto stack<T>::pop() -> void {
+//	std::lock_guard<std::mutex> lock(mut);
+//	if (alloc.count() == 0) {
+//		throw;
+//	}
+//	else {
+//		alloc.destroy(alloc.get() + alloc.count() - 1);
+//	}
+//}
 
-template<typename T> /*strong*/
-inline auto stack<T>::pop() -> void {
+template <typename T>
+auto stack<T>::pop() throw(std::logic_error) -> const std::shared_ptr<T> {
 	std::lock_guard<std::mutex> lock(mut);
-	if (alloc.count() == 0) {
+	if (alloc.empty()) {
 		throw;
 	}
 	else {
+		const std::shared_ptr<T> top(std::make_shared<T>(alloc.get()[alloc.count() - 1]));
 		alloc.destroy(alloc.get() + alloc.count() - 1);
+		return top;
 	}
 }
 
@@ -292,8 +314,10 @@ auto stack<T>::print() -> void {
 
 template<typename T> /*strong*/
 inline auto stack<T>::operator=(stack const & rhs) -> stack & {
-	std::lock_guard<std::mutex> lock(mut);
 	if (this != &rhs) {
+		std::lock(mut, rhs.mut);
+		std::lock_guard<std::mutex> left_lock(mut, std::adopt_lock);
+		std::lock_guard<std::mutex> right_lock(rhs.mut, std::adopt_lock);
 		(allocator<T>(rhs.alloc)).swap(this->alloc);
 	}
 	return *this;
