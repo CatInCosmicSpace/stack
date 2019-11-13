@@ -1,5 +1,5 @@
 #include "stack.hpp"
-#include <catch.hpp>
+#include "catch.hpp"
 
 SCENARIO("Stack: init", "[init]") {
 	stack<size_t> a;
